@@ -25,6 +25,7 @@ import { cssVar, plotTheme } from '../app/theme';
 import { SCALES, VARS, formatRange, varById } from '../app/vars';
 import { CanvasPlot, type PlotConfig, type Tick } from '../plot/canvas-plot';
 import type { LinkGroup, Range } from '../plot/range';
+import { formatTick, linearTicks } from '../plot/ticks';
 import { Segmented, Select } from './controls';
 import { Icon } from './icons';
 import { CursorBar } from './CursorBar';
@@ -61,16 +62,16 @@ const cursorMark = () => {
   return c ? { key: cursorSeriesKey(c), index: c.index, time: cursorTimeMs() } : null;
 };
 
-function varTicks(): Tick[] {
+function varTicks(min: number, max: number): Tick[] {
   const scales = varSel.value.map(varById).filter((v) => v.scale).map((v) => v.scale!);
   const same = scales.length > 0 && scales.every((s) => s === scales[0]);
   if (same) {
+    // деления в единицах величины: «круглые» значения, пересчитанные в координаты графика
     const s = SCALES[scales[0]];
-    return [0, 0.25, 0.5, 0.75, 1].map((g) => {
-      const v = (g - s.b) / s.a;
-      const digits = s.max - s.min < 0.1 ? 3 : s.max - s.min <= 2 ? 2 : 0;
-      return { v: g, label: (Math.abs(v) < 1e-12 ? 0 : v).toFixed(digits).replace('-', '−') };
-    });
+    const lo = (min - s.b) / s.a;
+    const hi = (max - s.b) / s.a;
+    const { values, step } = linearTicks(Math.min(lo, hi), Math.max(lo, hi), 5);
+    return values.map((v) => ({ v: v * s.a + s.b, label: formatTick(v, step) }));
   }
   return [
     { v: 0, label: 'мин' },
