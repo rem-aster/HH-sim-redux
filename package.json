@@ -1,0 +1,33 @@
+{
+  "name": "hhsim-web",
+  "private": true,
+  "version": "1.0.0",
+  "description": "HHsim — веб-версия графического симулятора нейрона Ходжкина–Хаксли",
+  "license": "GPL-2.0-or-later",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "screenshots": "node scripts/screenshots.mjs"
+  },
+  "dependencies": {
+    "@preact/signals": "^2.11.2",
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@preact/preset-vite": "^2.10.6",
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rem-aster/HH-sim-redux"
+  }
+}

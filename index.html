@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HHsim — симулятор Ходжкина–Хаксли</title>
+    <meta
+      name="description"
+      content="HHsim — интерактивная модель возбудимой мембраны нейрона по уравнениям Ходжкина–Хаксли: потенциал действия, ионные каналы, стимулы, препараты, фиксация потенциала. Работает в браузере."
+    />
+    <meta name="theme-color" content="#0d1117" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <script>
+      // тема до загрузки стилей — без мигания
+      try {
+        const t = JSON.parse(localStorage.getItem('hhsim:theme') || '"auto"');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>Для работы HHsim нужен JavaScript.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
