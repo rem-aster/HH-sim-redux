@@ -43,7 +43,7 @@ export const SPEEDS: Record<SpeedId, { label: string; msPerSec: number; hint: st
   slow: { label: 'Медленно', msPerSec: 5, hint: '5 мс модельного времени в секунду' },
   normal: { label: 'Нормально', msPerSec: 25, hint: '25 мс модельного времени в секунду' },
   fast: { label: 'Быстро', msPerSec: 120, hint: '120 мс модельного времени в секунду' },
-  instant: { label: 'Мгновенно', msPerSec: Infinity, hint: 'Считать без анимации, как можно быстрее' },
+  instant: { label: 'Мгновенно', msPerSec: Infinity, hint: 'Без анимации; непрерывный счёт — 1 с в секунду' },
 };
 export const speed = signal<SpeedId>(load('speed', 'normal'));
 
@@ -204,7 +204,10 @@ function frame(now: number): void {
   lastFrame = now;
   if (engine.running) {
     const sp = SPEEDS[speed.value].msPerSec;
-    engine.advance(Number.isFinite(sp) ? (sp / 1000) * dt : Infinity, 14);
+    // «Мгновенно» считает до установления сразу; непрерывный счёт — не быстрее 1 с модельного времени в секунду,
+    // чтобы история не разрасталась слишком быстро
+    const budget = Number.isFinite(sp) ? (sp / 1000) * dt : engine.continuous ? dt : Infinity;
+    engine.advance(budget, 14);
     follow();
     redraw();
   }

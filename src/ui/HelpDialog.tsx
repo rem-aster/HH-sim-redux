@@ -2,7 +2,18 @@ import { signal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import { Icon } from './icons';
 
+/** Справка открыта (обновляется по событиям самого диалога). */
 export const helpOpen = signal(false);
+let dialogEl: HTMLDialogElement | null = null;
+
+export function openHelp(): void {
+  if (dialogEl && !dialogEl.open) dialogEl.showModal();
+  helpOpen.value = true;
+}
+
+export function closeHelp(): void {
+  dialogEl?.close();
+}
 
 const KEYS: [string, string][] = [
   ['1 / 2', 'Стим1 / Стим2'],
@@ -22,18 +33,26 @@ const KEYS: [string, string][] = [
 
 export function HelpDialog() {
   const ref = useRef<HTMLDialogElement>(null);
-  const open = helpOpen.value;
   useEffect(() => {
-    const d = ref.current!;
-    if (open && !d.open) d.showModal();
-    if (!open && d.open) d.close();
-  }, [open]);
+    dialogEl = ref.current;
+    return () => {
+      dialogEl = null;
+    };
+  }, []);
   const base = import.meta.env.BASE_URL;
   return (
-    <dialog ref={ref} class="dialog help" onClose={() => (helpOpen.value = false)} aria-labelledby="help-title">
+    <dialog
+      ref={ref}
+      class="dialog help"
+      onClose={(e) => {
+        // событие close приходит асинхронно: справку могли уже открыть снова
+        helpOpen.value = (e.currentTarget as HTMLDialogElement).open;
+      }}
+      aria-labelledby="help-title"
+    >
       <div class="dialog-head">
         <h2 id="help-title">Справка</h2>
-        <button type="button" class="btn btn-ghost btn-icon" onClick={() => (helpOpen.value = false)} aria-label="Закрыть">
+        <button type="button" class="btn btn-ghost btn-icon" onClick={closeHelp} aria-label="Закрыть">
           <Icon name="x" />
         </button>
       </div>

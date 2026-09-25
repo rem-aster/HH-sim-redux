@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'preact/hooks';
 import { clearPlots, nudge, recall, runOrStop, stim } from '../app/actions';
 import { hideCursor, moveCursor } from '../app/cursor';
 import { cursor, engine, mode, resetView, sidebarWidth, toast, zoomView } from '../app/store';
-import { HelpDialog, helpOpen } from './HelpDialog';
+import { HelpDialog, openHelp } from './HelpDialog';
 import { Icon } from './icons';
 import { ChannelsPanel } from './panels/ChannelsPanel';
 import { DrugsPanel } from './panels/DrugsPanel';
@@ -24,10 +24,10 @@ function useShortcuts() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'F1' || (e.key === '?' && !isTyping(e))) {
         e.preventDefault();
-        helpOpen.value = true;
+        openHelp();
         return;
       }
-      if (isTyping(e) || e.ctrlKey || e.metaKey || e.altKey || helpOpen.value) return;
+      if (isTyping(e) || e.ctrlKey || e.metaKey || e.altKey || document.querySelector('dialog[open]')) return;
       const cc = engine.mode === 'cc';
       let handled = true;
       switch (e.code) {

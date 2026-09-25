@@ -6,7 +6,7 @@ import { varSel } from '../app/store';
 import { Menu, MenuItem, Segmented } from './controls';
 import { Icon } from './icons';
 import { livePlots } from './PlotArea';
-import { helpOpen } from './HelpDialog';
+import { openHelp } from './HelpDialog';
 
 function plotEntries(): PlotEntry[] {
   if (engine.mode === 'cc') {
@@ -266,7 +266,7 @@ export function Toolbar() {
             </>
           )}
         </Menu>
-        <button type="button" class="btn btn-ghost btn-icon" onClick={() => (helpOpen.value = true)} title="Справка (F1 или ?)" aria-label="Справка">
+        <button type="button" class="btn btn-ghost btn-icon" onClick={openHelp} title="Справка (F1 или ?)" aria-label="Справка">
           <Icon name="help" size={18} />
         </button>
       </div>

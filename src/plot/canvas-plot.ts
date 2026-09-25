@@ -559,6 +559,14 @@ export class CanvasPlot {
 
   // ---------------------------------------------------------------- указатель
 
+  /** Пересчитать время под указателем после изменения масштаба или сдвига. */
+  private syncHover(): void {
+    const hp = this.hoverPx;
+    if (!hp) return;
+    const R = this.rect();
+    this.cfg.group.setHover(hp.x >= R.l && hp.x <= R.r ? this.fromPx(hp.x, hp.y)[0] : null);
+  }
+
   private localXY(e: PointerEvent | WheelEvent | MouseEvent): { x: number; y: number } {
     const r = this.canvas.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -618,6 +626,8 @@ export class CanvasPlot {
         this.cfg.group.x.set(d.xr[0] - dx, d.xr[1] - dx);
         this.cfg.y.set(d.yr[0] + dy, d.yr[1] + dy);
         this.cfg.onUserView?.('xy');
+        this.hoverPx = p;
+        this.syncHover();
       }
       this.invalidate();
       return;
@@ -662,6 +672,8 @@ export class CanvasPlot {
       }
       this.cfg.onUserView?.(xOnly ? 'x' : 'xy');
     }
+    if (e.pointerType === 'mouse') this.hoverPx = { x: d.x, y: d.y };
+    this.syncHover();
     this.invalidate();
   };
 
@@ -699,11 +711,13 @@ export class CanvasPlot {
       const shift = (d / (R.r - R.l)) * xr.span;
       xr.set(xr.min + shift, xr.max + shift);
       this.cfg.onUserView?.('x');
-      return;
+    } else {
+      const k = Math.exp(dy * (e.ctrlKey ? 0.01 : 0.0025));
+      if (e.altKey) this.zoomY(p.y, k);
+      else this.zoomAt(p.x, p.y, k, false);
     }
-    const k = Math.exp(dy * (e.ctrlKey ? 0.01 : 0.0025));
-    if (e.altKey) this.zoomY(p.y, k);
-    else this.zoomAt(p.x, p.y, k, false);
+    this.hoverPx = p;
+    this.syncHover();
   };
 
   /** Масштаб относительно точки: k < 1 — увеличение. */
